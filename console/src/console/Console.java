@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.LinkedList;
 import java.util.Queue;
 
 import javax.swing.JOptionPane;
@@ -48,7 +49,8 @@ public class Console extends Device8080 {
 	public Console(Byte addressIn, Byte addressOut, Byte addressStatus) {
 		super("tty", "Serial", true, addressIn, true, addressOut, addressStatus);
 		loadSettings();
-		// openConnection();
+		openConnection();
+		inputBuffer = new LinkedList<Byte>();
 	}// Constructor -
 
 	@Override
@@ -89,18 +91,21 @@ public class Console extends Device8080 {
 		return byteToCPU;
 	}// byteToCPU
 	
-	public void changeSerialConnection(){
+	public void setSerialConnection(){
+		closeConnection();
 		PortSetupDetails psd = new PortSetupDetails(terminalSettings);
 		psd.setVisible(true);
-		//openConnection();
+		openConnection();
 	}
 
 	private void openConnection() {
+		
 		if (serialPort != null) {
-			String msg = String.format("Serial Port %s is already opened",
-					terminalSettings.getPortName());
-			JOptionPane.showMessageDialog(null, msg);
-			return;
+//			String msg = String.format("Serial Port %s is already opened%nClosing Port....",
+//					terminalSettings.getPortName());
+//			JOptionPane.showMessageDialog(null, msg);
+			//closeConnection();
+			serialPort = null;
 		}
 		serialPort = new SerialPort(terminalSettings.getPortName());
 
@@ -114,7 +119,7 @@ public class Console extends Device8080 {
 		} catch (SerialPortException ex) {
 			System.out.println(ex);
 		}// try
-
+		saveSettings();
 	}// openConnection
 
 	private void closeConnection() {
@@ -128,10 +133,11 @@ public class Console extends Device8080 {
 		}// if
 	}// closeConnection
 
-	public void setUpSerialSettings() {
-		PortSetupDetails psd = new PortSetupDetails(terminalSettings);
-		psd.setVisible(true);
-	}// setUpSerialSettings
+//	public void setUpSerialSettings() {
+//		PortSetupDetails psd = new PortSetupDetails(terminalSettings);
+//		psd.setVisible(true);
+//		openConnection();
+//	}// setUpSerialSettings
 
 	public TerminalSettings getTerminalSettings() {
 		return terminalSettings;
@@ -158,7 +164,7 @@ public class Console extends Device8080 {
 			terminalSettings.setDefaultSettings();
 			terminalSettings.setPortName("COM2");
 		}// try
-		saveSettings();
+
 	}// loadSettings(fileName)
 
 	public void saveSettings() {
