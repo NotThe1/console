@@ -122,7 +122,7 @@ public class Console extends Device8080 {
 		saveSettings();
 	}// openConnection
 
-	private void closeConnection() {
+	public void closeConnection() {
 		if (serialPort != null) {
 			try {
 				serialPort.closePort();
